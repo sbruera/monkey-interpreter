@@ -34,6 +34,7 @@ func (p *Parser) peekError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
+// Moves current token and peek token one position
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
@@ -57,6 +58,8 @@ func (p *Parser) parseStament() ast.Statment {
 	switch p.curToken.Type {
 	case token.LET:
 		return p.parseLetStament()
+	case token.RETURN:
+		return p.parseReturnStament()
 	default:
 		return nil
 
@@ -84,14 +87,32 @@ func (p *Parser) parseLetStament() *ast.LetStatment {
 	return stmt
 }
 
+func (p *Parser) parseReturnStament() *ast.ReturnStament {
+	stmt := &ast.ReturnStament{Token: p.curToken}
+
+	p.nextToken()
+
+	for !p.curTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+// If the current token matches the t, return true
+// else return false.
 func (p *Parser) curTokenIs(t token.TokenType) bool {
 	return p.curToken.Type == t
 }
 
+// If the next token matches the t, return true
+// else return false.
 func (p *Parser) peekTokenIs(t token.TokenType) bool {
 	return p.peekToken.Type == t
 }
 
+// If next token matches the t advance to next token and return true
+// else we peek the error into the array and return false
 func (p *Parser) expectPeek(t token.TokenType) bool {
 	if p.peekTokenIs(t) {
 		p.nextToken()

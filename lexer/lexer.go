@@ -15,6 +15,7 @@ func New(input string) *Lexer {
 	return l
 }
 
+//Moves the current position and the next char by one
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
@@ -25,6 +26,8 @@ func (l *Lexer) readChar() {
 	l.readPosition += 1
 }
 
+//Return the next token and advance current position and the next read position 
+//by one
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
@@ -90,10 +93,12 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
+//Creates a Token with given type and literal
 func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
+//When we find a char that is a letter, we need to read the whole word
 func (l *Lexer) readIdentifier() string {
 	position := l.position
 	for isLetter(l.ch) {
@@ -102,6 +107,8 @@ func (l *Lexer) readIdentifier() string {
 	return l.input[position:l.position]
 }
 
+//If char is a letter return true
+// else return false
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
 }
@@ -118,12 +125,14 @@ func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
 }
 
+//Skip spaces, indets and others whitespaces
 func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
 	}
 }
 
+//Return next char without moving any position
 func (l *Lexer) peekChar() byte {
 	if l.readPosition >= len(l.input) {
 		return 0

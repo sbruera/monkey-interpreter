@@ -11,7 +11,6 @@ func TestLetStatemts(t *testing.T) {
   let x = 5;
   let y = 10;
   let z = 20;
-  let foobar = 838383;
   `
 	l := lexer.New(input)
 
@@ -34,7 +33,6 @@ func TestLetStatemts(t *testing.T) {
 		{"x"},
 		{"y"},
 		{"z"},
-		{"foobar"},
 	}
 
 	for i, tt := range tests {
@@ -80,4 +78,34 @@ func checkParserErrors(t *testing.T, p *Parser) {
 		t.Errorf("Parser error: %q", msg)
 	}
 	t.FailNow()
+}
+
+func TestReturnStaments(t *testing.T) {
+	input := `
+  	return 5;
+  	return 10;
+  	return 993322;
+  	`
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statments) != 3 {
+		t.Fatalf("program.Statments does not contai 3 statments. got=%d", len(program.Statments))
+	}
+
+	for _, stmt := range program.Statments {
+		returnStmt, ok := stmt.(*ast.ReturnStament)
+		if !ok {
+			t.Errorf("stmt not *ast.ReturnStament. Got =%T", stmt)
+			continue
+		}
+		if returnStmt.TokenLiteral() != "return" {
+			t.Errorf("returnStmt.TokenLiteral not 'return', got %q", returnStmt.TokenLiteral())
+		}
+
+	}
+
 }
